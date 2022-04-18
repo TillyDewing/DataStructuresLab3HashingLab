@@ -6,8 +6,9 @@ package body HashTableStr16 is
    
    package UniqueRandIntegers is new RandomInt(tableSize);
    use UniqueRandIntegers;
-   function ConvertString is new Ada.Unchecked_Conversion(String, Long_Integer);
-   function ConvertInt is new Ada.Unchecked_Conversion(Long_Integer, Integer);
+   
+   function ConvertString2 is new Ada.Unchecked_Conversion (String, Short_Integer);
+   function ConvertChar is new Ada.Unchecked_Conversion (Character, Integer);
    
    procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --Handles collison by returning next address to look at.
    begin
@@ -92,16 +93,15 @@ package body HashTableStr16 is
       return 0; --Key not in Table/ Table Full
    end GetProbes;
   
-   function GenerateBadHashAddress(aKey: in String) return Integer is --Required function from lab.
+   function GenerateBadHashAddress(str: in String) return Integer is --Required function from lab.
    pragma Suppress (Overflow_Check); --Ignore integer overflow.
    begin
       declare
-         Sum: Long_Integer;
          HA: Integer;
       begin
-         Sum := ( (ConvertString(aKey(3..4)) + ConvertString(aKey(1..1)) )  /  256 +  ConvertString(aKey(12..13)) ) / 65536 + ConvertString(aKey(5..5)); --Hash Function from Lab
-         Put("Sum Before Devision Remainder: "); put(Sum); new_Line;
-         HA := ConvertInt((Sum) mod (Long_Integer(tableSize) + 1)); --Division Remainder to Ensure address is in range of table size
+         HA := ((Integer(ConvertString2(str(3..4))) + Integer(ConvertChar(str(1)))) / 256 + Integer(ConvertString2(str(12..13)))) / 65536 + Integer(ConvertChar(str(5)));
+         --Put("Sum Before Devision Remainder: "); put(Sum); new_Line;
+         --HA := ConvertInt((Sum) mod (Long_Integer(tableSize) + 1)); --Division Remainder to Ensure address is in range of table size
          return HA;
       end;
    end GenerateBadHashAddress;
