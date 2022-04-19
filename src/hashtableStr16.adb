@@ -1,25 +1,31 @@
 --Tilly Dewing Spring 2022 Data Structures Lab 3
-with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, ada.Long_Integer_Text_IO, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, ada.Long_Integer_Text_IO;
+with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions;
 package body HashTableStr16 is
    
    package UniqueRandIntegers is new RandomInt(tableSize);
    use UniqueRandIntegers;
    
    --Conversions for required hash function
-   function ConvertString2 is new Ada.Unchecked_Conversion (String, Short_Integer);
-   function ConvertChar is new Ada.Unchecked_Conversion (Character, Integer);
+   --Seems in my ada compiler Integer is 32bit same as long_integer so I used integer instead
+   function ConvertString2 is new Ada.Unchecked_Conversion (String, Short_Integer); --2 char string to 16bit integer
+   function ConvertChar is new Ada.Unchecked_Conversion (Character, Integer); 
+   
    --Data Type and Conversions for my hash function
+   type Unsigned_Integer is mod 2**32; --Unsigned 32bit integer 0..(2*32)-1
+   package Unsigned_IntegerIO is new Ada.Text_IO.Modular_IO(Unsigned_Integer);
+   use Unsigned_IntegerIO;
+   function ConvertString4 is new Ada.Unchecked_Conversion (String, Integer);-- 4 char string to 32bit signed integer
+   function ConvertInteger is new Ada.Unchecked_Conversion (Integer, Unsigned_Integer);
+    function ConvertUnsignedInteger is new Ada.Unchecked_Conversion (Unsigned_Integer, Integer);
    
    procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --Handles collison by returning next address to look at.
    begin
       numProbes := numProbes + 1;
       if useRandomProbe then --Random Probe
-         Put("Random Probe Collision at HA: "); put(HA);
          HA := HA + UniqueRandInt;
          if HA > tableSize then -- Wrap around HA exceeds size of the table.
              HA := HA - tableSize;
          end if;
-         put("Next location: "); put(HA); New_Line;
       else --Linear Probe
          HA := HA + 1;
          if HA > tableSize then
@@ -105,13 +111,35 @@ package body HashTableStr16 is
    end GenerateBadHashAddress;
    
    function GenerateGoodHashAddress(aKey: in String) return Integer is --Custom Hash Function
+      A,B: Integer;
+      sum: Unsigned_Integer;
    begin
-      return 0;
+      --Most words less than 8 characters avg word in english is 6
+      --Take first 8 characters split into 2 32bit integers
+      A := ConvertString4(aKey(2..5));
+      B := ConvertString4(aKey(6..9));
+      --Sum the results is an unsigned 32bit int
+      sum := ConvertInteger(A) + ConvertInteger(B);
+      --Division remainder to get HA
+      sum := sum * sum;
+      sum := sum mod 128 + 1;      
+      return ConvertUnsignedInteger(sum);
+     
    end GenerateGoodHashAddress;
    
    function GetTableUsage return Float is --returns table usage perc
    begin
       return float(numRecords) / float(tableSize);
    end GetTableUsage;
+   
+   function GetExpectedProbes return float is
+      perc: Float := GetTableUsage;
+   begin
+      if useRandomProbe then
+         return -(1.0/perc) * Log(1.0-perc);
+      else
+         return (1.0-perc/2.0)/(1.0-perc);
+      end if;
+   end GetExpectedProbes;
    
 end HashTableStr16;

@@ -16,4 +16,5 @@ package HashTableStr16 is
    function GenerateBadHashAddress(str: in String) return Integer;     --HashFunction Specified in Lab
    function GenerateGoodHashAddress(aKey: in String) return Integer;   --Improved Hash Function
    function GetTableUsage return Float;
+   function GetExpectedProbes return float;
 end HashTableStr16;
