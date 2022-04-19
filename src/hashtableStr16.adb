@@ -1,14 +1,14 @@
 --Tilly Dewing Spring 2022 Data Structures Lab 3
-with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO;
+with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, ada.Long_Integer_Text_IO, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, ada.Long_Integer_Text_IO;
 package body HashTableStr16 is
-   package LongIntIO is new Ada.Text_IO.Integer_IO(Standard.Long_Integer); 
-   use LongIntIO;
    
    package UniqueRandIntegers is new RandomInt(tableSize);
    use UniqueRandIntegers;
    
+   --Conversions for required hash function
    function ConvertString2 is new Ada.Unchecked_Conversion (String, Short_Integer);
    function ConvertChar is new Ada.Unchecked_Conversion (Character, Integer);
+   --Data Type and Conversions for my hash function
    
    procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --Handles collison by returning next address to look at.
    begin
@@ -100,8 +100,6 @@ package body HashTableStr16 is
          HA: Integer;
       begin
          HA := ((Integer(ConvertString2(str(3..4))) + Integer(ConvertChar(str(1)))) / 256 + Integer(ConvertString2(str(12..13)))) / 65536 + Integer(ConvertChar(str(5)));
-         --Put("Sum Before Devision Remainder: "); put(Sum); new_Line;
-         --HA := ConvertInt((Sum) mod (Long_Integer(tableSize) + 1)); --Division Remainder to Ensure address is in range of table size
          return HA;
       end;
    end GenerateBadHashAddress;

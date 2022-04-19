@@ -1,4 +1,4 @@
-hashtablestr16.adb:11:04: warning: types for unchecked conversion have different sizes [-gnatwz]
+hashtablestr16.adb:10:04: warning: types for unchecked conversion have different sizes [-gnatwz]
 hashtablestr16.adb:102:45: warning: index for "str" may assume lower bound of 1 [-gnatww]
 hashtablestr16.adb:102:45: warning: suggested replacement: "str'First + 2" [-gnatww]
 hashtablestr16.adb:102:48: warning: index for "str" may assume lower bound of 1 [-gnatww]
