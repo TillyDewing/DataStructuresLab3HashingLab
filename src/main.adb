@@ -19,10 +19,10 @@ begin
       open(wordsFile, In_File, "Words200D16.txt"); --Get word File
       Ada.Integer_Text_IO.Default_Width := 0;
       --Insert up to percentage full
-      while HashTable.GetTableUsage <= 0.85 loop --Table less than % full
+      while HashTable.GetTableUsage <= 0.40 loop --Table less than % full
          get(wordsFile, tempWord);
          Put_Line(tempWord);
-         HashTable.Insert(tempWord, HashTable.GenerateBadHashAddress(tempWord));
+         HashTable.Insert(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
          numInserted := numInserted + 1;
       end loop;
       Close(wordsFile);
@@ -33,7 +33,7 @@ begin
       open(wordsFile, In_File, "Words200D16.txt");
       for J in 1..N loop
          get(wordsFile, tempWord);
-         numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateBadHashAddress(tempWord));
+         numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
          Put(tempWord); put(" In "); put(numProbes); New_Line;
 
          if numProbes < minProbes then
@@ -56,7 +56,7 @@ begin
       totalProbes := 0;
       for J in (numInserted - N)..numInserted loop
          get(wordsFile, tempWord);
-         numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateBadHashAddress(tempWord));
+         numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
          Put(tempWord); put(" In "); put(numProbes); New_Line;
 
          if numProbes < minProbes then
@@ -67,11 +67,10 @@ begin
 
          totalProbes := totalProbes + numProbes;
       end loop;
-      put(totalProbes);
       avgProbe := float(totalProbes)/Float(N); --Avg to locate N probes
       Put("probes to locate last "); put(N); put(" items: avg"); Put(avgProbe); put(" min: ");
       put(minProbes); put(" max "); put(maxProbes); New_Line;
       put("Expected probes: "); put(HashTable.GetExpectedProbes);
-
+      HashTable.PrintTable;
    end;
    end Main;

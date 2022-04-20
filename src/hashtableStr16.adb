@@ -9,9 +9,8 @@ package body HashTableStr16 is
    --Seems in my ada compiler Integer is 32bit same as long_integer so I used integer instead
    function ConvertString2 is new Ada.Unchecked_Conversion (String, Short_Integer); --2 char string to 16bit integer
    function ConvertChar is new Ada.Unchecked_Conversion (Character, Integer); 
-   
    --Data Type and Conversions for my hash function
-   type Unsigned_Integer is mod 2**32; --Unsigned 32bit integer 0..(2*32)-1
+   type Unsigned_Integer is mod 2**64; --Unsigned 64bit integer
    package Unsigned_IntegerIO is new Ada.Text_IO.Modular_IO(Unsigned_Integer);
    use Unsigned_IntegerIO;
    function ConvertString4 is new Ada.Unchecked_Conversion (String, Integer);-- 4 char string to 32bit signed integer
@@ -100,7 +99,6 @@ package body HashTableStr16 is
    end GetProbes;
   
    function GenerateBadHashAddress(str: in String) return Integer is --Required function from lab.
-   pragma Suppress (Overflow_Check); --Ignore integer overflow.
    begin
       declare
          HA: Integer;
@@ -110,21 +108,22 @@ package body HashTableStr16 is
       end;
    end GenerateBadHashAddress;
    
-   function GenerateGoodHashAddress(aKey: in String) return Integer is --Custom Hash Function
-      A,B: Integer;
+   function GenerateGoodHashAddress(aKey: in String) return Integer is --Tilly's Hash Function
+      A,B,C: Integer;
       sum: Unsigned_Integer;
    begin
-      --Most words less than 8 characters avg word in english is 6
-      --Take first 8 characters split into 2 32bit integers
-      A := ConvertString4(aKey(2..5));
-      B := ConvertString4(aKey(6..9));
-      --Sum the results is an unsigned 32bit int
-      sum := ConvertInteger(A) + ConvertInteger(B);
-      --Division remainder to get HA
+      --Almost all words padded with spaces ignore last 4 characters
+      A := ConvertString4(aKey(1..4));
+      B := ConvertString4(aKey(5..8));
+      C := ConvertString4(aKey(9..12));
+      --Sum the results in an unsigned 64bit int
+      sum := ConvertInteger(A) + ConvertInteger(B) + ConvertInteger(C);
+      --Square the Sum and extract 7 bits to form address.
       sum := sum * sum;
-      sum := sum mod 128 + 1;      
+      sum:= sum * 2**11; --lose 11 high order bits
+      sum := (sum / 2**57); --Get lower 7 bits for hash address
       return ConvertUnsignedInteger(sum);
-     
+
    end GenerateGoodHashAddress;
    
    function GetTableUsage return Float is --returns table usage perc
@@ -142,4 +141,11 @@ package body HashTableStr16 is
       end if;
    end GetExpectedProbes;
    
+   procedure PrintTable is
+   begin
+      Put_Line("Printing Hash Table Contents....");
+      for I in 1..tableSize loop
+         put(I); put(" : "); put(table(I).aKey); put(" : "); put(table(i).HA); put(" : "); put(table(i).numProbes); New_Line;
+      end loop;
+   end PrintTable;
 end HashTableStr16;

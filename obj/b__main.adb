@@ -252,11 +252,11 @@ package body ada_main is
    end;
 
 --  BEGIN Object file/option list
-   --   C:\temp\DataStructures\HashingLab\obj\randomint.o
-   --   C:\temp\DataStructures\HashingLab\obj\hashtableStr16.o
-   --   C:\temp\DataStructures\HashingLab\obj\main.o
-   --   -LC:\temp\DataStructures\HashingLab\obj\
-   --   -LC:\temp\DataStructures\HashingLab\obj\
+   --   C:\GNAT\2021\bin\HashingLab\obj\randomint.o
+   --   C:\GNAT\2021\bin\HashingLab\obj\hashtableStr16.o
+   --   C:\GNAT\2021\bin\HashingLab\obj\main.o
+   --   -LC:\GNAT\2021\bin\HashingLab\obj\
+   --   -LC:\GNAT\2021\bin\HashingLab\obj\
    --   -LC:/gnat/2021/lib/gcc/x86_64-w64-mingw32/10.3.1/adalib/
    --   -static
    --   -lgnat
