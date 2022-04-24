@@ -9,7 +9,7 @@ package HashTableStr16 is
       HA: Integer := 0;
       numProbes: Integer := 0;
    end record;
-   table: array(1..(tableSize)) of TableRecord;
+   procedure Initialize;
    procedure Insert(aKey: in String; HA: in Integer);
    procedure Delete(aKey: in String; HA: in Integer);
    function GetProbes(aKey: in String; HA: in Integer) return Integer; --Returns number of probes to locate aKey in table. Return value of 0 means value not in table.

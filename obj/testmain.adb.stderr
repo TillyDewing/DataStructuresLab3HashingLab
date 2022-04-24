@@ -1,0 +1,2 @@
+testmain.adb:13:04: warning: types for unchecked conversion have different sizes [-gnatwz]
+testmain.adb:14:04: warning: types for unchecked conversion have different sizes [-gnatwz]

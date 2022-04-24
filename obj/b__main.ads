@@ -40,7 +40,7 @@ package ada_main is
    pragma Export (C, main, "main");
 
    type Version_32 is mod 2 ** 32;
-   u00001 : constant Version_32 := 16#fc66d282#;
+   u00001 : constant Version_32 := 16#5df54ee0#;
    pragma Export (C, u00001, "mainB");
    u00002 : constant Version_32 := 16#2e11c0b1#;
    pragma Export (C, u00002, "system__standard_libraryB");
@@ -372,20 +372,24 @@ package ada_main is
    pragma Export (C, u00165, "ada__numerics__aux_long_long_floatS");
    u00166 : constant Version_32 := 16#33fcdf18#;
    pragma Export (C, u00166, "ada__numerics__aux_short_floatS");
-   u00167 : constant Version_32 := 16#d4b3b601#;
+   u00167 : constant Version_32 := 16#988a1b4f#;
    pragma Export (C, u00167, "hashtablestr16B");
-   u00168 : constant Version_32 := 16#59098e19#;
+   u00168 : constant Version_32 := 16#7175aa5d#;
    pragma Export (C, u00168, "hashtablestr16S");
    u00169 : constant Version_32 := 16#f6840f7e#;
    pragma Export (C, u00169, "randomintB");
    u00170 : constant Version_32 := 16#d3faa297#;
    pragma Export (C, u00170, "randomintS");
-   u00171 : constant Version_32 := 16#14e654cb#;
-   pragma Export (C, u00171, "system__img_llluS");
-   u00172 : constant Version_32 := 16#eca5ecae#;
-   pragma Export (C, u00172, "system__memoryB");
-   u00173 : constant Version_32 := 16#76873720#;
-   pragma Export (C, u00173, "system__memoryS");
+   u00171 : constant Version_32 := 16#0f9a77f5#;
+   pragma Export (C, u00171, "system__direct_ioB");
+   u00172 : constant Version_32 := 16#8d9bb72a#;
+   pragma Export (C, u00172, "system__direct_ioS");
+   u00173 : constant Version_32 := 16#14e654cb#;
+   pragma Export (C, u00173, "system__img_llluS");
+   u00174 : constant Version_32 := 16#eca5ecae#;
+   pragma Export (C, u00174, "system__memoryB");
+   u00175 : constant Version_32 := 16#76873720#;
+   pragma Export (C, u00175, "system__memoryS");
 
    --  BEGIN ELABORATION ORDER
    --  ada%s
@@ -556,6 +560,8 @@ package ada_main is
    --  ada.float_text_io%b
    --  ada.integer_text_io%s
    --  ada.integer_text_io%b
+   --  system.direct_io%s
+   --  system.direct_io%b
    --  randomint%s
    --  randomint%b
    --  hashtablestr16%s

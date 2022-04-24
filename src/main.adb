@@ -5,7 +5,7 @@ use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Float_Text_IO;
 procedure Main is
 begin
    declare
-      package HashTable is new HashTableStr16(128, True);
+      package HashTable is new HashTableStr16(128, False);
       package ARandomInt is new RandomInt(128);
       function ConvertCount is new Ada.Unchecked_Conversion(Integer, Count);
       use ARandomInt;
@@ -16,10 +16,11 @@ begin
       wordsFile: File_Type;
       tempWord: String(1..16);
    begin
+      HashTable.Initialize;
       open(wordsFile, In_File, "Words200D16.txt"); --Get word File
       Ada.Integer_Text_IO.Default_Width := 0;
       --Insert up to percentage full
-      while HashTable.GetTableUsage <= 0.40 loop --Table less than % full
+      while HashTable.GetTableUsage <= 0.85 loop --Table less than % full
          get(wordsFile, tempWord);
          Put_Line(tempWord);
          HashTable.Insert(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
@@ -31,10 +32,11 @@ begin
       N := 30; --num of keys to search for
       minProbes := (2**31)-1;
       open(wordsFile, In_File, "Words200D16.txt");
+      New_Line;
       for J in 1..N loop
          get(wordsFile, tempWord);
          numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
-         Put(tempWord); put(" In "); put(numProbes); New_Line;
+         --Put(tempWord); put(" In "); put(numProbes); New_Line;
 
          if numProbes < minProbes then
             minProbes := numProbes;
@@ -57,7 +59,7 @@ begin
       for J in (numInserted - N)..numInserted loop
          get(wordsFile, tempWord);
          numProbes := HashTable.GetProbes(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
-         Put(tempWord); put(" In "); put(numProbes); New_Line;
+         --Put(tempWord); put(" In "); put(numProbes); New_Line;
 
          if numProbes < minProbes then
             minProbes := numProbes;
@@ -70,7 +72,7 @@ begin
       avgProbe := float(totalProbes)/Float(N); --Avg to locate N probes
       Put("probes to locate last "); put(N); put(" items: avg"); Put(avgProbe); put(" min: ");
       put(minProbes); put(" max "); put(maxProbes); New_Line;
-      put("Expected probes: "); put(HashTable.GetExpectedProbes);
+      put("Expected probes: "); put(HashTable.GetExpectedProbes); New_Line;
       HashTable.PrintTable;
    end;
    end Main;

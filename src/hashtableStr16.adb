@@ -1,5 +1,5 @@
 --Tilly Dewing Spring 2022 Data Structures Lab 3
-with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions;
+with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions, ada.Direct_IO, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions;
 package body HashTableStr16 is
    
    package UniqueRandIntegers is new RandomInt(tableSize);
@@ -15,7 +15,22 @@ package body HashTableStr16 is
    use Unsigned_IntegerIO;
    function ConvertString4 is new Ada.Unchecked_Conversion (String, Integer);-- 4 char string to 32bit signed integer
    function ConvertInteger is new Ada.Unchecked_Conversion (Integer, Unsigned_Integer);
-    function ConvertUnsignedInteger is new Ada.Unchecked_Conversion (Unsigned_Integer, Integer);
+   function ConvertUnsignedInteger is new Ada.Unchecked_Conversion (Unsigned_Integer, Integer);
+   --Conversions/package for file access
+   package TableRecordIO is new ada.Direct_IO(TableRecord);
+   use TableRecordIO;
+   function CountToInt is new ada.Unchecked_Conversion(TableRecordIO.Count, Integer);
+   function IntToCount is new ada.Unchecked_Conversion(Integer, TableRecordIO.Count);
+   file: TableRecordIO.File_Type;
+
+   procedure Initialize is
+      blankRec: TableRecord;
+   begin
+      Create(file, InOut_File, "table.txt");
+      for I in 1..(tableSize + 1) loop --Allocate file up to table size;
+         Write(file,blankRec);
+      end loop;
+   end Initialize;
    
    procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --Handles collison by returning next address to look at.
    begin
@@ -28,29 +43,34 @@ package body HashTableStr16 is
       else --Linear Probe
          HA := HA + 1;
          if HA > tableSize then
-            HA := 1;
+            HA := 2;
          end if;
       end if;
    end GetNextProbe;
    
    procedure Insert(aKey: in String; HA: in Integer) is 
       tempHA, numProbes: Integer;
+      rec:TableRecord;
    begin
       InitialRandInt;
       numProbes := 1;
       tempHA:= HA;
       Put("Attempting Insert on: "); put(aKey); Put(" at HA: "); put(HA); New_Line;
       while numProbes <= tableSize loop
+         Set_Index(file, IntToCount(tempHA));
+         Read(file, rec);
          --Key Already in table
-         if table(tempHA).aKey = aKey then
+         if rec.aKey = aKey then
             Put_Line("Key Already in table");
             return;
          end if;
          --Insert Key
-         if table(tempHA).HA = 0 or table(tempHA).HA = -1 then --Record is empty or was deleted Insert New Record
-            table(tempHA).aKey := aKey;
-            table(tempHA).HA := HA;
-            table(tempHA).numProbes := numProbes;
+         if rec.aKey = "                " then --Record is empty or was deleted Insert New Record
+            Set_Index(file, IntToCount(tempHA)); --Reading line increases index by 1 set back to HA
+            rec.aKey := aKey;
+            rec.HA := HA;
+            rec.numProbes := numProbes;
+            Write(file, rec);
             numRecords := numRecords + 1;
             Put("Inserted at: "); put(tempHA); Put(" in "); put(numProbes); put(" Probes"); New_Line;
             return; --Key Inserted
@@ -65,14 +85,19 @@ package body HashTableStr16 is
    
    procedure Delete(aKey: in String; HA: in Integer) is --Deletes Entry from Hash Table Sets HA of location to -1 to mark deletion
       tempHA, numProbes: Integer := 1;                  --This procedure is probably unessesary for the lab but wanted the package to more useful
+      rec:TableRecord;
    begin
       InitialRandInt;
       tempHA := HA;
       while numProbes <= tableSize loop
-         if table(tempHA).aKey = aKey then
+         Set_Index(file, IntToCount(tempHA));
+         Read(file,rec);
+         if rec.aKey = aKey then
+            Set_Index(file, IntToCount(tempHA));
             Put_Line("Deleted");
-            table(tempHA).HA := -1; --Mark that location used to hold data
-            table(tempHA).numProbes := 0;
+            rec.HA := -1; --Mark that location used to hold data
+            rec.numProbes := 0;
+            Write(file, rec);
             numRecords := numRecords - 1;
             return;
          else
@@ -83,13 +108,16 @@ package body HashTableStr16 is
    
    function GetProbes(aKey: in String; HA: in Integer) return Integer is --Returns number of probes to locate aKey in table. Return value of 0 means value not in table.
       tempHA,numProbes: Integer := 1;
+      rec:TableRecord;
    begin 
       InitialRandInt;
       tempHA := HA;
       while numProbes <= tableSize loop
-         if table(tempHA).aKey = aKey then
+         Set_Index(file, IntToCount(tempHA));
+         Read(file,rec);
+         if rec.aKey = aKey then
             return numProbes;--Key Found
-         elsif table(tempHA).HA = 0 then --if location is empty
+         elsif rec.HA = 0 then --if location is empty
             return 0; --key is not in table;
          else
             GetNextProbe(tempHA, numProbes);
@@ -142,10 +170,13 @@ package body HashTableStr16 is
    end GetExpectedProbes;
    
    procedure PrintTable is
+      rec: TableRecord;
    begin
       Put_Line("Printing Hash Table Contents....");
       for I in 1..tableSize loop
-         put(I); put(" : "); put(table(I).aKey); put(" : "); put(table(i).HA); put(" : "); put(table(i).numProbes); New_Line;
+         Set_Index(file, IntToCount(I));
+         Read(file,rec);
+         put(I); put(" : "); put(rec.aKey); put(" : "); put(rec.HA); put(" : "); put(rec.numProbes); New_Line;
       end loop;
    end PrintTable;
 end HashTableStr16;
