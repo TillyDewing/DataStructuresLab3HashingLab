@@ -1,4 +1,5 @@
 --Tilly Dewing Spring 2022 Data Structures Lab 3
+--B Option Relative File.
 with Ada.Unchecked_Conversion, Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions, ada.Direct_IO, RandomInt;  use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Numerics.Elementary_Functions;
 package body HashTableStr16 is
    
@@ -32,18 +33,18 @@ package body HashTableStr16 is
       end loop;
    end Initialize;
    
-   procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --Handles collison by returning next address to look at.
+   procedure GetNextProbe(HA: in out Integer; numProbes: in out Integer) is --returns next address in collision.
    begin
       numProbes := numProbes + 1;
-      if useRandomProbe then --Random Probe
+      if useRandomProbe then         --Random Probe
          HA := HA + UniqueRandInt;
          if HA > tableSize then -- Wrap around HA exceeds size of the table.
              HA := HA - tableSize;
          end if;
-      else --Linear Probe
+      else                           --Linear Probe
          HA := HA + 1;
          if HA > tableSize then
-            HA := 2;
+            HA := 1;
          end if;
       end if;
    end GetNextProbe;
@@ -82,29 +83,6 @@ package body HashTableStr16 is
       Put_Line("OverFlow!! Table is full");
       return;
    end Insert;
-   
-   procedure Delete(aKey: in String; HA: in Integer) is --Deletes Entry from Hash Table Sets HA of location to -1 to mark deletion
-      tempHA, numProbes: Integer := 1;                  --This procedure is probably unessesary for the lab but wanted the package to more useful
-      rec:TableRecord;
-   begin
-      InitialRandInt;
-      tempHA := HA;
-      while numProbes <= tableSize loop
-         Set_Index(file, IntToCount(tempHA));
-         Read(file,rec);
-         if rec.aKey = aKey then
-            Set_Index(file, IntToCount(tempHA));
-            Put_Line("Deleted");
-            rec.HA := -1; --Mark that location used to hold data
-            rec.numProbes := 0;
-            Write(file, rec);
-            numRecords := numRecords - 1;
-            return;
-         else
-            GetNextProbe(tempHA, numProbes);
-         end if;
-      end loop;
-   end Delete;
    
    function GetProbes(aKey: in String; HA: in Integer) return Integer is --Returns number of probes to locate aKey in table. Return value of 0 means value not in table.
       tempHA,numProbes: Integer := 1;
@@ -150,6 +128,7 @@ package body HashTableStr16 is
       sum := sum * sum;
       sum:= sum * 2**11; --lose 11 high order bits
       sum := (sum / 2**57); --Get lower 7 bits for hash address
+      if sum = 0 then sum := 1; end if;
       return ConvertUnsignedInteger(sum);
 
    end GenerateGoodHashAddress;
@@ -169,6 +148,29 @@ package body HashTableStr16 is
       end if;
    end GetExpectedProbes;
    
+   procedure Delete(aKey: in String; HA: in Integer) is --Deletes Entry 
+      tempHA, numProbes: Integer := 1;                  --Sets HA of location to -1 to mark deletion
+      rec:TableRecord;                                  --This procedure is probably unessesary for the lab
+   begin
+      InitialRandInt;
+      tempHA := HA;
+      while numProbes <= tableSize loop
+         Set_Index(file, IntToCount(tempHA));
+         Read(file,rec);
+         if rec.aKey = aKey then
+            Set_Index(file, IntToCount(tempHA));
+            Put_Line("Deleted");
+            rec.HA := -1; --Mark that location used to hold data
+            rec.numProbes := 0;
+            Write(file, rec);
+            numRecords := numRecords - 1;
+            return;
+         else
+            GetNextProbe(tempHA, numProbes);
+         end if;
+      end loop;
+   end Delete;
+   
    procedure PrintTable is
       rec: TableRecord;
    begin
@@ -176,7 +178,7 @@ package body HashTableStr16 is
       for I in 1..tableSize loop
          Set_Index(file, IntToCount(I));
          Read(file,rec);
-         put(I); put(" : "); put(rec.aKey); put(" : "); put(rec.HA); put(" : "); put(rec.numProbes); New_Line;
+         put(I); put(" | "); put(rec.aKey); put(" | "); put(rec.HA); put(" | "); put(rec.numProbes); New_Line;
       end loop;
    end PrintTable;
 end HashTableStr16;

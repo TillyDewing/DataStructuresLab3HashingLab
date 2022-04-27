@@ -1,4 +1,5 @@
 --Tilly Dewing Spring 2022 Data Structures Lab 3
+--B Option Relative File
 generic
    tableSize: Integer;
    useRandomProbe: Boolean;  --Random Probe(True) Linear Probe(False)

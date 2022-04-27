@@ -5,7 +5,7 @@ use Ada.Text_IO, Ada.Integer_Text_IO, Ada.Float_Text_IO;
 procedure Main is
 begin
    declare
-      package HashTable is new HashTableStr16(128, False);
+      package HashTable is new HashTableStr16(128, false);
       package ARandomInt is new RandomInt(128);
       function ConvertCount is new Ada.Unchecked_Conversion(Integer, Count);
       use ARandomInt;
@@ -18,9 +18,8 @@ begin
    begin
       HashTable.Initialize;
       open(wordsFile, In_File, "Words200D16.txt"); --Get word File
-      Ada.Integer_Text_IO.Default_Width := 0;
       --Insert up to percentage full
-      while HashTable.GetTableUsage <= 0.85 loop --Table less than % full
+      while HashTable.GetTableUsage <= 0.40 loop --Table less than % full
          get(wordsFile, tempWord);
          Put_Line(tempWord);
          HashTable.Insert(tempWord, HashTable.GenerateGoodHashAddress(tempWord));
